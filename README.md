@@ -9,6 +9,6 @@ The traffic light is optimized to serve as many cars as possible while also bala
 
 # Demo
 
-<img width="191" alt="image" src="https://user-images.githubusercontent.com/95982168/201211368-b3c8ffc7-db9a-4b5d-8157-f1f411f230f5.png">
+<img width="345" alt="image" src="https://user-images.githubusercontent.com/95982168/201211507-52bc75e7-d79f-4165-95ad-d7a5f287aa1f.png">
 
 The demonstration for this project was done on a FPGA DE-2 board, where switches would act as sensors, key buttons as a clock, and HEX displays as the traffic light itself. This allows the user to test individual scenarios to test the logic of the traffic light itself.
