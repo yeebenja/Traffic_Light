@@ -1,4 +1,4 @@
-# Traffic_Light
+# Traffic Light
 
 # Overview
 This project was done in my EECS 270: Intro to Logic Design. In this lab, I have created a traffic light to service the following T intersection:
@@ -12,3 +12,6 @@ The traffic light is optimized to serve as many cars as possible while also bala
 <img width="345" alt="image" src="https://user-images.githubusercontent.com/95982168/201211507-52bc75e7-d79f-4165-95ad-d7a5f287aa1f.png">
 
 The demonstration for this project was done on a FPGA DE-2 board, where switches would act as sensors, key buttons as a clock, and HEX displays as the traffic light itself. This allows the user to test individual scenarios to test the logic of the traffic light itself.
+
+# Configurability
+The user will have to implement their own hardware for the sensor, clock, and display, however, the logic design has been completed for your pleasure. Enjoy!
