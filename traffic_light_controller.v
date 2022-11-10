@@ -1,0 +1,242 @@
+
+
+module traffic_light_controller(W, EL, NL, E, clk, WTL, ELTL, NLTL, ETL, counter_HEX6, counter_HEX7, sys_reset);
+	
+	input W, EL, NL, E;
+	input clk;
+	input sys_reset;
+	
+	output reg [6:0] WTL;
+	output reg [6:0] ETL;
+	output reg [6:0] NLTL;
+	output reg [6:0] ELTL;
+	output [6:0] counter_HEX6;
+	output [6:0] counter_HEX7;
+	
+	
+	
+	// Still have to set inputs and outputs
+	
+	
+	reg [3:0] current_state;
+	reg [3:0] next_state;
+	parameter state_0 = 4'b0000;
+	parameter state_1 = 4'b0001;
+	parameter state_2 = 4'b0010;
+	parameter state_0to1 = 4'b0011;
+	parameter state_1to0 = 4'b0100;
+	parameter state_1to2 = 4'b0101;
+	parameter state_2to1 = 4'b0110;
+	parameter state_2to0 = 4'b0111;
+	parameter state_0to2 = 4'b1000;
+	
+	wire all_sensors_on = W & EL & NL & E;
+	wire all_sensors_off = ~W & ~EL & ~NL & ~E;
+
+	reg [3:0] counter;
+	initial counter = 4'b0000;
+	parameter minimum = 4'b0010;
+	parameter ten = 4'b0110;
+	reg counter_reset;
+	initial counter_reset = 0;
+//	parameter green = 2'b00;
+//	parameter red = 2'b10;
+//	parameter yellow = 2'b01;
+	
+	parameter green = 7'b0010000; // green
+	parameter yellow = 7'b0010001; // yellow
+	parameter red = 7'b0101111; // red
+	
+	
+// Next State Verilog
+//always@*
+//begin
+//
+//case (current_state)	
+//	// State 0 arrows going out of state 0
+//	state_0: if(((E | W) & ~NL & ~EL)) next_state = state_0;
+//				else if((~E & ~W & ~NL & EL) & (counter > minimum)) next_state = state_0to2;
+//				else next_state = state_0to1;
+//	
+////	1. Check for staying in the state
+////	2. Check for going backwards
+////	3. Else, go counterclock-wise
+//
+//	
+//	// State 1 arrows going out of state 1
+//	state_1: if((~E & ~W & NL & ~EL)) next_state = state_1;
+//				else if(((E | W) & ~NL & ~EL) & (counter > minimum)) next_state = state_1to0;
+//				else next_state = state_1to2;
+//	
+//	// State 2 arrows going out of state 2
+//	state_2: if(~E & ~W & EL & ~NL) next_state = state_2;
+//				else if((E & ~W & NL & ~EL) & (counter > minimum)) next_state = state_2to1;
+//				else next_state = state_2to0;
+//				
+// 	
+//	// State 0 -> state 1
+//	state_0to1: if(current_state == state_0to1) next_state = state_1;
+// 	
+//	// State 1 -> state 2
+//	state_1to2: if(current_state == state_1to2) next_state = state_2;	
+// 	
+//	// State 2 -> state 0
+//	state_2to0: if(current_state == state_2to0) next_state = state_0;	
+//	
+//	// State 1 -> state 0
+//	state_0to1: if(current_state == state_1to0) next_state = state_0;
+// 	
+//	// State 2 -> state 1
+//	state_1to2: if(current_state == state_2to1) next_state = state_1;	
+// 	
+//	// State 0 -> state 2
+//	state_2to0: if(current_state == state_0to2) next_state = state_2;	
+//	endcase
+//end
+
+always@*
+begin
+	case(current_state)
+	state_0: if (((all_sensors_on || all_sensors_off || (NL && ~E && ~W && ~EL)) && (counter > minimum)) || ((NL && (E || W) && ~EL) && (counter > ten)))
+									 next_state = state_0to1;
+				else if (((EL && ~E && ~W && ~NL) && (counter > minimum)) || ((EL && (E || W) && ~NL) && (counter > ten)))
+									 next_state = state_0to2;
+				else if (((NL && EL) || ((E || W)) && NL) && (counter > minimum))
+									 next_state = state_0to1;
+				else 
+									 next_state = state_0;
+																	
+	state_1: if (((all_sensors_on || all_sensors_off || (~NL && ~E && ~W && EL)) && (counter > minimum)) || ((NL && EL && ~E && ~W) && (counter > ten)))
+									 next_state = state_1to2;
+				else if ((((E || W) && ~NL && ~EL) && (counter > minimum)) || ((NL && (E || W) && ~EL) && (counter > ten)))
+									 next_state = state_1to0;
+				else if (((EL && (E || W)) || (NL && EL)) && (counter > minimum))
+									 next_state = state_1to2;
+				else 
+									 next_state = state_1;
+																	
+	state_2: if (((all_sensors_on || all_sensors_off || ((E || W) && ~NL && ~EL)) && (counter > minimum)) || ((EL && (E || W) && ~NL) && (counter > ten)))
+									 next_state = state_2to0;
+				else if (((~E && ~W && NL && ~EL) && (counter > minimum)) || ((NL && EL && ~E && ~W) && (counter > ten)))
+									 next_state = state_2to1;
+				else if (((NL && (E || W)) || (EL && (E || W))) && (counter > minimum))
+									 next_state = state_2to0;
+				else 
+									 next_state = state_2;
+																						 
+	state_0to1: next_state = state_1;
+	state_2to1: next_state = state_1;
+	state_1to2: next_state = state_2;
+	state_0to2: next_state = state_2;
+	state_1to0: next_state = state_0;
+	state_2to0: next_state = state_0;
+					
+endcase
+end
+
+
+
+// clock
+
+
+always@(posedge clk)
+begin	
+		if(sys_reset) 
+		begin
+			current_state <= state_0;
+			counter <= 0;
+		end
+		else
+			current_state <= next_state;
+
+// Timer
+	if(counter_reset | sys_reset)
+		counter <= 0;
+	else
+		counter <= counter + 1;
+end
+
+// Output logic
+
+always@*
+	
+begin
+	// Green = 2'b00
+	// Red = 2'b10
+	// Yellow = 2'b01
+	case(current_state)
+		state_0: begin
+				ETL = green;
+				WTL = green;
+				NLTL = red;
+				ELTL = red;
+				counter_reset = 0;
+		end
+		state_1: begin
+				ETL = green;
+				WTL = red;
+				NLTL = green;
+				ELTL = red;
+				counter_reset = 0;
+		end
+		state_2: begin
+				ETL = red;
+				WTL = red;
+				NLTL = red;
+				ELTL = green;
+				counter_reset = 0;
+		end
+		state_0to1: begin
+				ETL = green;
+				WTL = yellow;
+				NLTL = red;
+				ELTL = red;
+				counter_reset = 1;
+		end
+		state_1to0: begin
+				ETL = green;
+				WTL = red;
+				NLTL = yellow;
+				ELTL = red;
+				counter_reset = 1;
+		end
+		state_1to2: begin
+				ETL = yellow;
+				WTL = red;
+				NLTL = yellow;
+				ELTL = red;
+				counter_reset = 1;
+		end
+		state_2to1: begin
+				ETL = red;
+				WTL = red;
+				NLTL = red;
+				ELTL = yellow;
+				counter_reset = 1;
+		end
+		state_2to0: begin
+				ETL = red;
+				WTL = red;
+				NLTL = red;
+				ELTL = yellow;
+				counter_reset = 1;
+		end
+		state_0to2: begin
+				ETL = yellow;
+				WTL = yellow;
+				NLTL = red;
+				ELTL = red;
+				counter_reset = 1;
+				
+		end
+	endcase
+
+end
+	
+
+display_clock in5(counter, counter_HEX6, counter_HEX7);
+
+// Note, still have to implement timer HEX
+
+		
+endmodule

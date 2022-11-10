@@ -1,0 +1,9 @@
+
+
+module display(code, HEX0);
+	input [1:0] code;
+	reg []
+
+
+
+endmodule

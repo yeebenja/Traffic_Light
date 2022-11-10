@@ -1,0 +1,20 @@
+
+
+module timer_module(sys_reset, count);
+
+input sys_reset;
+output [1:0] count;
+
+reg [1:0] count;
+reg [1:0] current_state;
+reg [1:0] next_state;
+
+
+always@*
+
+begin
+	if(sys_reset)
+		count = 2'b00;
+	if(~sys_reset)
+		if()
+end

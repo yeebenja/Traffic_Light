@@ -1,0 +1,8 @@
+
+
+module traffic_light(SW, HEX, KEY)
+
+input [17:0] SW;
+input [0] KEY;
+output [7:0] HEX;
+

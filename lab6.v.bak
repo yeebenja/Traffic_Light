@@ -1,0 +1,14 @@
+
+
+module lab6(SW, HEX, KEY);
+
+input [17:0] SW;
+input [0] KEY;
+output [7:0] HEX;
+
+wire clock;
+wire [1:0] count;
+
+traffic_light_controller inst1();
+
+endmodule
